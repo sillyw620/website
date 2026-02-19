@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Algoritmos de Ordenamiento</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #e9ecef;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1200px;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(44, 167, 219, 0.3);
+            padding: 2.5rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(44, 219, 216, 0.1);
+        }
+
+        #canvas {
+            border: 2px solid #2CA7DB;
+            border-radius: 15px;
+            background: rgba(15, 20, 25, 0.8);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .btn {
+            border-radius: 30px;
+            padding: 0.75rem 2.5rem;
+            font-weight: 600;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(44, 167, 219, 0.3);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(44, 167, 219, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #2CA7DB, #2C6FDB);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #5386DB, #2C38DB);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+            color: white;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background: linear-gradient(45deg, #592CDB, #2C38DB);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(89, 44, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(89, 44, 219, 0.4);
+        }
+
+        .audio-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .audio-toggle-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .audio-toggle-btn.muted {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+        }
+
+        h1 {
+            color: #2CDBD8;
+            text-shadow: 0 2px 4px rgba(44, 219, 216, 0.3);
+        }
+
+        .form-select,
+        .form-control {
+            background: rgba(15, 20, 25, 0.8);
+            border: 2px solid #2CA7DB;
+            color: #e9ecef;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 4px rgba(44, 167, 219, 0.1);
+        }
+
+        .form-select:focus,
+        .form-control:focus {
+            border-color: #fd7e14;
+            box-shadow: 0 0 0 0.2rem rgba(253, 126, 20, 0.25);
+        }
+
+        .info-panel {
+            background: linear-gradient(135deg, rgba(15, 20, 25, 0.9), rgba(26, 26, 46, 0.9));
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(44, 167, 219, 0.2);
+        }
+
+        .info-panel {
+            background: rgba(15, 20, 25, 0.8);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html" class="btn btn-light back-btn" title="Volver al Portafolio">&larr;</a>
+    <div class="container">
+        <h1 class="text-center mb-4">Visualización de Algoritmos de Ordenamiento</h1>
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <label for="algorithm" class="form-label">Algoritmo</label>
+                <select id="algorithm" class="form-select">
+                    <option value="bubble">Bubble Sort</option>
+                    <option value="selection">Selection Sort</option>
+                    <option value="insertion">Insertion Sort</option>
+                    <option value="quick">Quick Sort</option>
+                    <option value="merge">Merge Sort</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="size" class="form-label">Número de Elementos (10-1000)</label>
+                <input type="number" id="size" class="form-control" min="10" max="1000" value="50">
+            </div>
+            <div class="col-md-4 d-flex align-items-end gap-2">
+                <button id="start" class="btn btn-success">Iniciar</button>
+                <button id="reset" class="btn btn-danger" style="display: none;">Reiniciar</button>
+            </div>
+        </div>
+        <div class="info-panel">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Complejidad Temporal</h5>
+                    <p id="complexity">Selecciona un algoritmo</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Tiempo de Ejecución</h5>
+                    <p id="time">0.00 s</p>
+                </div>
+            </div>
+        </div>
+        <canvas id="canvas" width="1000" height="400"></canvas>
+    </div>
+
+    <button id="audio-toggle" class="audio-toggle-btn" title="Toggle audio">🔊</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const algorithmSelect = document.getElementById('algorithm');
+        const sizeInput = document.getElementById('size');
+        const startBtn = document.getElementById('start');
+        const resetBtn = document.getElementById('reset');
+        const complexityDisplay = document.getElementById('complexity');
+        const timeDisplay = document.getElementById('time');
+
+        let array = [];
+        let isSorting = false;
+        let isPaused = false;
+        let startTime;
+        let animationId;
+        let audioEnabled = localStorage.getItem('sortingAudioEnabled') === 'true';
+        let audioContext;
+
+        const complexities = {
+            bubble: 'O(n²) - Peor caso, O(n²) - Promedio, O(n) - Mejor caso',
+            selection: 'O(n²) - Peor caso, O(n²) - Promedio, O(n²) - Mejor caso',
+            insertion: 'O(n²) - Peor caso, O(n²) - Promedio, O(n) - Mejor caso',
+            quick: 'O(n²) - Peor caso, O(n log n) - Promedio, O(n log n) - Mejor caso',
+            merge: 'O(n log n) - Peor caso, O(n log n) - Promedio, O(n log n) - Mejor caso'
+        };
+
+        function initAudio() {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playSound(frequency, duration = 100) {
+            if (!audioEnabled || !audioContext) return;
+            const sampleRate = audioContext.sampleRate;
+            const numSamples = Math.floor(sampleRate * duration / 1000);
+            const buffer = audioContext.createBuffer(1, numSamples, sampleRate);
+            const data = buffer.getChannelData(0);
+            const fadeSamples = Math.floor(numSamples * 0.1); // 10% fade in/out
+
+            for (let i = 0; i < numSamples; i++) {
+                let amplitude = 0.1;
+                if (i < fadeSamples) {
+                    amplitude *= i / fadeSamples; // fade in
+                } else if (i > numSamples - fadeSamples) {
+                    amplitude *= (numSamples - i) / fadeSamples; // fade out
+                }
+                data[i] = amplitude * Math.sin(2 * Math.PI * frequency * i / sampleRate);
+            }
+
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContext.destination);
+            source.start();
+        }
+
+        function playEndSequence() {
+            // Audio playback at end removed
+        }
+
+        async function endAnimation() {
+            for (let i = 0; i < array.length; i++) {
+                if (!isSorting) return; // Allow interruption by reset
+                drawArray([i], '#ffc107'); // Yellow highlight for "processing"
+                if (audioEnabled) {
+                    const frequency = 200 + (array[i] / 400) * 600; // Scale to 200-800Hz
+                    playSound(frequency, 200);
+                }
+                await sleep(20);
+            }
+            drawArray(); // Clear highlights
+        }
+
+        function generateArray(size) {
+            array = [];
+            for (let i = 0; i < size; i++) {
+                array.push(Math.floor(Math.random() * 400) + 10);
+            }
+        }
+
+        function drawArray(highlights = [], highlightColor = '#dc3545') {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const barWidth = canvas.width / array.length;
+            for (let i = 0; i < array.length; i++) {
+                const barHeight = array[i];
+                const x = i * barWidth;
+                const y = canvas.height - barHeight;
+                ctx.fillStyle = highlights.includes(i) ? highlightColor : '#2CA7DB';
+                ctx.fillRect(x, y, barWidth - 1, barHeight);
+            }
+        }
+
+        async function bubbleSort() {
+            for (let i = 0; i < array.length; i++) {
+                for (let j = 0; j < array.length - i - 1; j++) {
+                    if (isPaused) await waitForResume();
+                    if (!isSorting) return;
+                    playSound(array[j]);
+                    playSound(array[j + 1]);
+                    if (array[j] > array[j + 1]) {
+                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                    }
+                    drawArray([j, j + 1]);
+                    await sleep(10);
+                }
+            }
+        }
+
+        async function selectionSort() {
+            for (let i = 0; i < array.length; i++) {
+                let minIdx = i;
+                for (let j = i + 1; j < array.length; j++) {
+                    if (isPaused) await waitForResume();
+                    if (!isSorting) return;
+                    playSound(array[j]);
+                    if (array[j] < array[minIdx]) {
+                        minIdx = j;
+                    }
+                    drawArray([i, j, minIdx]);
+                    await sleep(10);
+                }
+                if (minIdx !== i) {
+                    [array[i], array[minIdx]] = [array[minIdx], array[i]];
+                }
+            }
+        }
+
+        async function insertionSort() {
+            for (let i = 1; i < array.length; i++) {
+                let key = array[i];
+                let j = i - 1;
+                while (j >= 0 && array[j] > key) {
+                    if (isPaused) await waitForResume();
+                    if (!isSorting) return;
+                    playSound(array[j]);
+                    array[j + 1] = array[j];
+                    j--;
+                    drawArray([j + 1, i]);
+                    await sleep(10);
+                }
+                array[j + 1] = key;
+            }
+        }
+
+        async function quickSort(arr, low = 0, high = arr.length - 1) {
+            if (low < high) {
+                let pi = await partition(arr, low, high);
+                await quickSort(arr, low, pi - 1);
+                await quickSort(arr, pi + 1, high);
+            }
+        }
+
+        async function partition(arr, low, high) {
+            let pivot = arr[high];
+            let i = low - 1;
+            for (let j = low; j < high; j++) {
+                if (isPaused) await waitForResume();
+                if (!isSorting) return;
+                playSound(arr[j]);
+                if (arr[j] < pivot) {
+                    i++;
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                drawArray([i, j, high]);
+                await sleep(10);
+            }
+            [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+            return i + 1;
+        }
+
+        async function mergeSort(arr, left = 0, right = arr.length - 1) {
+            if (left < right) {
+                let mid = Math.floor((left + right) / 2);
+                await mergeSort(arr, left, mid);
+                await mergeSort(arr, mid + 1, right);
+                await merge(arr, left, mid, right);
+            }
+        }
+
+        async function merge(arr, left, mid, right) {
+            let n1 = mid - left + 1;
+            let n2 = right - mid;
+            let L = arr.slice(left, mid + 1);
+            let R = arr.slice(mid + 1, right + 1);
+            let i = 0, j = 0, k = left;
+            while (i < n1 && j < n2) {
+                if (isPaused) await waitForResume();
+                if (!isSorting) return;
+                playSound(L[i]);
+                playSound(R[j]);
+                if (L[i] <= R[j]) {
+                    arr[k] = L[i];
+                    i++;
+                } else {
+                    arr[k] = R[j];
+                    j++;
+                }
+                drawArray([k]);
+                await sleep(10);
+                k++;
+            }
+            while (i < n1) {
+                arr[k] = L[i];
+                i++;
+                k++;
+            }
+            while (j < n2) {
+                arr[k] = R[j];
+                j++;
+                k++;
+            }
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function waitForResume() {
+            return new Promise(resolve => {
+                const check = () => {
+                    if (!isPaused) resolve();
+                    else setTimeout(check, 100);
+                };
+                check();
+            });
+        }
+
+        algorithmSelect.addEventListener('change', () => {
+            complexityDisplay.textContent = complexities[algorithmSelect.value];
+        });
+
+        document.getElementById('audio-toggle').addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            localStorage.setItem('sortingAudioEnabled', audioEnabled);
+            const btn = document.getElementById('audio-toggle');
+            btn.textContent = audioEnabled ? '🔊' : '🔇';
+            btn.classList.toggle('muted', !audioEnabled);
+            if (audioEnabled && !audioContext) {
+                initAudio();
+            }
+        });
+
+        // Set initial icon
+        const audioBtn = document.getElementById('audio-toggle');
+        audioBtn.textContent = audioEnabled ? '🔊' : '🔇';
+        audioBtn.classList.toggle('muted', !audioEnabled);
+
+        resetBtn.addEventListener('click', () => {
+            isSorting = false;
+            isPaused = false;
+            if (animationId) cancelAnimationFrame(animationId);
+            const size = parseInt(sizeInput.value) || 50;
+            generateArray(size);
+            drawArray();
+            timeDisplay.textContent = '0.00 s';
+            startBtn.disabled = false;
+            startBtn.textContent = 'Iniciar';
+            startBtn.className = 'btn btn-success';
+            resetBtn.style.display = 'none';
+        });
+
+        startBtn.addEventListener('click', async () => {
+            if (isSorting) return;
+
+            // Start sorting
+            isSorting = true;
+            isPaused = false;
+            startBtn.disabled = true;
+            resetBtn.style.display = 'inline-block';
+            startTime = Date.now();
+            const algorithm = algorithmSelect.value;
+            if (algorithm === 'bubble') await bubbleSort();
+            else if (algorithm === 'selection') await selectionSort();
+            else if (algorithm === 'insertion') await insertionSort();
+            else if (algorithm === 'quick') await quickSort(array);
+            else if (algorithm === 'merge') await mergeSort(array);
+            const endTime = Date.now();
+            const totalTime = ((endTime - startTime) / 1000).toFixed(2);
+            timeDisplay.textContent = totalTime + ' s';
+            await endAnimation();
+            playEndSequence();
+            isSorting = false;
+            startBtn.disabled = false;
+        });
+
+
+
+        sizeInput.addEventListener('change', () => {
+            generateArray(parseInt(sizeInput.value));
+            drawArray();
+        });
+
+        // Initialize
+        generateArray(50);
+        drawArray();
+        complexityDisplay.textContent = complexities['bubble'];
+    </script>
+</body>
+
+</html>

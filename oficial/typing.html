@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Velocidad de Escritura</title>
+    <!-- CSS de Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Fuentes de Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #e9ecef;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="10" cy="10" r="1" fill="rgba(44,219,216,0.1)"/><circle cx="90" cy="90" r="0.5" fill="rgba(44,167,219,0.1)"/><circle cx="50" cy="30" r="0.8" fill="rgba(89,44,219,0.1)"/></svg>') repeat;
+            animation: float 25s linear infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            100% {
+                transform: translateY(-50px) rotate(360deg);
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(44, 167, 219, 0.3);
+            padding: 2.5rem;
+            margin-top: 2rem;
+            animation: fadeIn 1s ease-out;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(44, 219, 216, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        #text-display {
+            border: 2px solid #2CA7DB;
+            padding: 1.5rem;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            height: 180px;
+            background: linear-gradient(135deg, rgba(15, 20, 25, 0.8) 0%, rgba(26, 26, 46, 0.8) 100%);
+            overflow-wrap: normal;
+            white-space: pre-wrap;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 3px 6px rgba(44, 167, 219, 0.1);
+            transition: box-shadow 0.3s ease;
+            color: #e9ecef;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        #text-display:focus {
+            box-shadow: inset 0 3px 6px rgba(44, 167, 219, 0.2), 0 0 0 3px rgba(44, 167, 219, 0.1);
+        }
+
+        .correct {
+            color: #28a745;
+            transition: color 0.3s ease;
+        }
+
+        .incorrect {
+            color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            text-decoration: underline;
+            transition: all 0.3s ease;
+        }
+
+        .current {
+            background: linear-gradient(90deg, #fff3cd, #ffeaa7);
+            border-radius: 5px;
+            transition: background 0.3s ease;
+            color: #000 !important;
+        }
+
+        #typing-input {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            resize: vertical;
+            border-radius: 15px;
+            border: 2px solid #ced4da;
+            transition: all 0.3s ease;
+            background: rgba(15, 20, 25, 0.8);
+            color: #e9ecef;
+        }
+
+        #typing-input:focus {
+            border-color: #2CA7DB;
+            box-shadow: 0 0 0 0.2rem rgba(44, 167, 219, 0.25);
+            background: rgba(26, 26, 46, 0.9);
+        }
+
+        .btn {
+            border-radius: 30px;
+            padding: 0.75rem 2.5rem;
+            font-weight: 600;
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 15px rgba(44, 167, 219, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(44, 167, 219, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #2CA7DB, #2C6FDB);
+            border: none;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #5386DB, #2C38DB);
+            border: none;
+            color: white;
+        }
+
+        #results {
+            background: linear-gradient(135deg, rgba(15, 20, 25, 0.8), rgba(26, 26, 46, 0.8));
+            border: 1px solid rgba(44, 167, 219, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 1.5rem;
+            animation: slideIn 0.8s ease-out;
+            box-shadow: 0 5px 15px rgba(44, 167, 219, 0.1);
+            color: #e9ecef;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        #results p {
+            margin: 0.75rem 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .progress {
+            height: 12px;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            background: rgba(44, 167, 219, 0.1);
+        }
+
+        .progress-bar {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            background: linear-gradient(45deg, #592CDB, #2C38DB);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(89, 44, 219, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(89, 44, 219, 0.4);
+        }
+
+        h1 {
+            color: #2CDBD8;
+            text-shadow: 0 2px 4px rgba(44, 219, 216, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html" class="btn btn-light back-btn" title="Volver al Portafolio">&larr;</a>
+    <div class="container">
+        <h1 class="text-center mb-4">Test de Velocidad de Escritura</h1>
+        <p class="text-center mb-4">Escribe el texto mostrado lo más rápido y preciso posible. ¡Buena suerte!</p>
+
+        <div class="progress mb-3" style="display: none;" id="progress-container">
+            <div class="progress-bar" id="progress-bar" role="progressbar" style="width: 0%"></div>
+        </div>
+
+        <div id="text-display" class="mb-3"></div>
+
+        <textarea id="typing-input" class="form-control mb-3" placeholder="Comienza a escribir aquí..." disabled
+            rows="3"></textarea>
+
+        <div class="d-flex justify-content-center gap-3 mb-4">
+            <button id="start-btn" class="btn btn-primary">Iniciar Prueba</button>
+            <button id="reset-btn" class="btn btn-secondary" disabled>Reiniciar</button>
+        </div>
+
+        <div id="results" class="text-center" style="display: none;">
+            <h3>¡Prueba Completada!</h3>
+            <p><strong>PPM:</strong> <span id="wpm">0</span></p>
+            <p><strong>Precisión:</strong> <span id="accuracy">0%</span></p>
+            <p><strong>Tiempo:</strong> <span id="time">0s</span></p>
+        </div>
+    </div>
+
+    <!-- JS de Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Test de Velocidad de Escritura
+        const textosMuestra = [
+            "Ha llegado el momento de que regreses al escenario. Las circunstancias no son casuales... han sido meticulosamente alineadas para que tu presencia vuelva a tener peso. El mundo ha continuado sin ti, aunque nada ha logrado llenar el vacío que dejaste. Personas influyentes me han... recordado tu utilidad. Y yo, como siempre, me limito a ajustar los hilos necesarios para que tus talentos vuelvan a ponerse en marcha. No se trata de elección. Es una reanudación. Un recordatorio de que el tiempo puede doblarse, suspenderse y... retomarse cuando resulta conveniente. Así que te pediré que despiertes. Es hora de continuar con el trabajo que dejaste pendiente, Dr. Freeman.",
+            "Debajo de estas tierras quietas descansa un reino que alguna vez cantó con vida. Sus caminos están cubiertos de polvo y silencio, pero aún guardan el eco de promesas antiguas. Aquellos que escuchan con atención sentirán la llamada tenue del vacío, una nota persistente que atraviesa piedra, hueso y memoria. Los valientes que se adentran aquí no buscan gloria. Buscan respuestas... o tal vez buscan perderse entre sombras que comprenden mejor que cualquier luz. Si avanzas, hazlo con cuidado. En Hallownest, incluso los susurros tienen peso, y cada paso puede recordarte que la caída del pasado sigue respirando en la oscuridad.",
+            "Bienvenido a Pandora, donde la vida es barata, la munición escasea y la cordura se perdió hace varias temporadas. Si estás leyendo esto, o eres muy valiente... o muy tonto. Probablemente ambas. Los cazadores de la Cámara vienen y van, dejando cráteres, cadáveres y promesas rotas. Pero tú, tú tienes ese brillo en los ojos... ese que dice: 'sí, voy a abrir esa puerta que claramente dice NO TOCAR'. No te preocupes por los gritos a lo lejos; seguramente es algún bandido motivado practicando poesía explosiva. Mantén tu arma cargada, tu ego inflado y tu sentido común enterrado bajo la arena. Pandora no perdona, pero al menos te da espectáculo.",
+            "La guerra nunca cambia. El viejo mundo cayó convencido de que su poder lo hacía inmortal, incapaz de imaginar que sus propias manos serían las que activarían el final. Entre nubes de fuego y promesas rotas, quedó claro que el progreso sin sensatez solo sirve para cavar tumbas más profundas. Las ciudades ardieron, las voces se apagaron y el silencio resultante dijo más que cualquier discurso. Entre las ruinas del después, los sobrevivientes repiten la coreografía de siempre: alianzas hechas a medias, traiciones veloces y la absurda idea de que pueden controlar la violencia que los creó. El polvo radiactivo no ha borrado las viejas costumbres; solo les dio un escenario distinto. Cada pequeño conflicto es un eco del desastre, como si la tierra misma se negara a olvidar lo que la destruyó. Las generaciones nuevas nacen sin conocer el mundo que existió, pero cargan igual con el peso de su legado. Intentan reconstruir, inventar, resistir... pero en cada esfuerzo se esconde la sombra familiar del conflicto. Todo cambia, menos la raíz que nos hunde. La guerra nunca cambia.",
+            "Hace mucho tiempo, dos especies compartieron la superficie del mundo: humanos y monstruos. No tardaron en enfrentarse, y la batalla que siguió terminó con la derrota de los monstruos. Fueron confinados bajo tierra, sellados detrás de una barrera mágica imposible de romper para ellos. Los años pasaron, y las historias sobre aquel encierro se transformaron en rumores lejanos. Pocos recordaban el conflicto, y menos aún se preguntaban qué había sido de los seres que quedaron atrapados en la oscuridad. Un día, un humano llegó hasta una montaña que, según decían, tragaba a quienes osaban escalarla. Allí, ese humano cayó en lo profundo... hacia un reino olvidado por el resto del mundo."
+        ];
+
+        let textoActual = '';
+        let tiempoInicio;
+        let intervaloTemporizador;
+        let pruebaActiva = false;
+        let temporizadorIniciado = false;
+        let indiceCaracter = 0;
+        let caracteresCorrectos = 0;
+        let caracteresTotales = 0;
+
+        const contenedorTexto = document.getElementById('text-display');
+        const entradaEscritura = document.getElementById('typing-input');
+        const btnIniciar = document.getElementById('start-btn');
+        const btnReiniciar = document.getElementById('reset-btn');
+        const divResultados = document.getElementById('results');
+        const spanPPM = document.getElementById('wpm');
+        const spanPrecision = document.getElementById('accuracy');
+        const spanTiempo = document.getElementById('time');
+        const contenedorProgreso = document.getElementById('progress-container');
+        const barraProgreso = document.getElementById('progress-bar');
+
+        function iniciarPrueba() {
+            textoActual = textosMuestra[Math.floor(Math.random() * textosMuestra.length)];
+            mostrarTexto();
+            entradaEscritura.value = '';
+            entradaEscritura.disabled = false;
+            btnIniciar.disabled = true;
+            btnReiniciar.disabled = false;
+            divResultados.style.display = 'none';
+            contenedorProgreso.style.display = 'block';
+            indiceCaracter = 0;
+            caracteresCorrectos = 0;
+            caracteresTotales = 0;
+            pruebaActiva = true;
+            temporizadorIniciado = false;
+            spanTiempo.textContent = '0s';
+        }
+
+        function mostrarTexto() {
+            // Build HTML with proper highlighting for the full continuous text
+            let html = '';
+
+            for (let i = 0; i < textoActual.length; i++) {
+                let clase = '';
+
+                if (i < indiceCaracter) {
+                    clase = textoActual[i] === entradaEscritura.value[i] ? 'correct' : 'incorrect';
+                } else if (i === indiceCaracter) {
+                    clase = 'current';
+                }
+
+                html += `<span class="${clase}">${textoActual[i]}</span>`;
+            }
+
+            contenedorTexto.innerHTML = html;
+
+            // Smooth scroll to keep current typing position visible
+            const currentSpan = contenedorTexto.querySelector('.current');
+            if (currentSpan) {
+                currentSpan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            actualizarProgreso();
+        }
+
+        function actualizarTiempo() {
+            const transcurrido = Math.floor((Date.now() - tiempoInicio) / 1000);
+            spanTiempo.textContent = transcurrido + 's';
+        }
+
+        function actualizarProgreso() {
+            const progreso = (indiceCaracter / textoActual.length) * 100;
+            barraProgreso.style.width = progreso + '%';
+        }
+
+        function calcularResultados() {
+            const tiempoEnMinutos = (Date.now() - tiempoInicio) / 60000;
+            const ppm = Math.round((caracteresCorrectos / 5) / tiempoEnMinutos);
+            const precision = caracteresTotales > 0 ? Math.round((caracteresCorrectos / caracteresTotales) * 100) : 0;
+            spanPPM.textContent = ppm;
+            spanPrecision.textContent = precision + '%';
+            divResultados.style.display = 'block';
+        }
+
+        entradaEscritura.addEventListener('input', (e) => {
+            if (!pruebaActiva) return;
+            if (!temporizadorIniciado) {
+                tiempoInicio = Date.now();
+                intervaloTemporizador = setInterval(actualizarTiempo, 1000);
+                temporizadorIniciado = true;
+            }
+            const entrada = e.target.value;
+            caracteresTotales = entrada.length;
+            indiceCaracter = entrada.length;
+            caracteresCorrectos = 0;
+            for (let i = 0; i < entrada.length; i++) {
+                if (entrada[i] === textoActual[i]) {
+                    caracteresCorrectos++;
+                }
+            }
+            mostrarTexto();
+            if (entrada.length === textoActual.length) {
+                pruebaActiva = false;
+                clearInterval(intervaloTemporizador);
+                calcularResultados();
+                entradaEscritura.disabled = true;
+                btnIniciar.disabled = false;
+            }
+        });
+
+        btnIniciar.addEventListener('click', iniciarPrueba);
+
+        btnReiniciar.addEventListener('click', () => {
+            clearInterval(intervaloTemporizador);
+            pruebaActiva = false;
+            temporizadorIniciado = false;
+            entradaEscritura.disabled = true;
+            btnIniciar.disabled = false;
+            btnReiniciar.disabled = true;
+            textoActual = textosMuestra[Math.floor(Math.random() * textosMuestra.length)];
+            indiceCaracter = 0;
+            caracteresCorrectos = 0;
+            caracteresTotales = 0;
+            contenedorTexto.innerHTML = '';
+            entradaEscritura.value = '';
+            divResultados.style.display = 'none';
+            contenedorProgreso.style.display = 'none';
+            mostrarTexto();
+        });
+
+        // Estado inicial
+        entradaEscritura.disabled = true;
+        btnReiniciar.disabled = true;
+    </script>
+</body>
+
+</html>
