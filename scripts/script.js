@@ -41,9 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (contactForm) {
         console.log('Form found, attaching listener');
 
-        // Inicializar EmailJS (reemplaza 'TU_PUBLIC_KEY' con tu clave pública de EmailJS)
+        // Inicializar EmailJS
         (function () {
-            emailjs.init('auvt6mm-PRjUX0bsB'); // Reemplaza esta línea con tu clave pública
+            emailjs.init('auvt6mm-PRjUX0bsB');
         })();
 
         contactForm.addEventListener('submit', function (e) {
@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = 'Enviando...';
 
             // Enviar correo usando EmailJS
-            // Reemplaza 'TU_SERVICE_ID' y 'TU_TEMPLATE_ID' con los valores de tu cuenta EmailJS
             emailjs.send('service_xsxtcmo', 'template_n7oqz9h', {
                 from_name: name,
                 from_email: email,
@@ -550,4 +549,5 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+
 });
